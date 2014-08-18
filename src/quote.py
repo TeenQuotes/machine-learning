@@ -1,4 +1,3 @@
-from csv import *
 from string import lower, punctuation as stringPunctuation
 
 class Quote(object):
