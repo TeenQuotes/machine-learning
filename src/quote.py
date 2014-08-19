@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
 from string import lower, punctuation as stringPunctuation
+from stemming.porter2 import stem
+from re import sub
 
 class Quote(object):
 	"""docstring for Quote"""
@@ -15,6 +18,15 @@ class Quote(object):
 
 		# Lowercase
 		self.content = lower(self.content)
+
+		# Replace smileys with words
+		self.content = sub("♥|<3", "heartsmiley", self.content)
+		self.content = sub(":\)|:-\)|;\)|;-\)", "happysmiley", self.content)
+		self.content = sub(":\(|:-\(|:'\(|:/", "sadsmiley", self.content)
+
+		# Stem each word of the sentence
+		self.content = ' '.join([stem(word) for word in self.content.split()])
+		
 		# Remove punctuation
 		self.content = "".join(l for l in self.content if l not in stringPunctuation)
 
