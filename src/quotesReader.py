@@ -23,7 +23,8 @@ class QuotesReader():
 		self.wordPosition()
 		
 	def getTextAndApproved(self):
-		"""Read a file and create a list of the content of quotes and a list with the associated moderation decision"""
+		"""Read a file and create a list of the content of quotes
+		and a list with the associated moderation decision"""
 		
 		rows = self.rows
 		
@@ -45,6 +46,8 @@ class QuotesReader():
 		self.quotesText     = quotesText
 		self.quotes         = quotes
 
+		print "%i exploitable quotes found" % len(quotes)
+
 	def extractUniqueWords(self):
 		"""Builds a list of whitespace delimited tokens from a list of strings."""			
 
@@ -53,16 +56,19 @@ class QuotesReader():
 		# Create a dictionnary word: nbOccurences
 		freqs = Counter(words.split())
 
-		# Keep words that appears at least 5 times
+		# Keep words that appear at least 5 times
 		freqs = {word: count for word, count in freqs.iteritems() if count >= 5}
 
 		# Keep only the words
 		wordsUnique = freqs.keys()
 
+		print "Extracted %i unique words" % len(wordsUnique)
+
 		self.wordsUnique = wordsUnique
 		self.saveWordsUnique()
 
 	def saveWordsUnique(self):
+		"""Save the list of wordsUnique in a text file"""
 		out = open('tmp/wordsUnique.txt', 'w')
 		out.write(' '.join(self.wordsUnique))
 
@@ -80,17 +86,18 @@ class QuotesReader():
 	def wordPosition(self):
 		"""Compute the vector of position of words for each quotes"""
 		
+		print "Computing the vector for each quote"
 		vectorPositions = []
-		i = 1
+		idQuote = 1
 		rangeProgress = self.constructListProgress()
 
 		for quote in self.quotes:
 			# Print the progress
-			if i in rangeProgress:
-				index = (rangeProgress.index(i) + 1) * 10
+			if idQuote in rangeProgress:
+				index = (rangeProgress.index(idQuote) + 1) * 10
 				print "%i%% done" % index
 			vectorPositions.append(quote.process(self.wordsUnique))
-			i += 1
+			idQuote += 1
 
 		self.wordPosition = vectorPositions
 	
