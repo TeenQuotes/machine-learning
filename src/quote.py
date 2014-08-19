@@ -40,8 +40,9 @@ class Quote(object):
 		# the position of the word in wordsUnique
 		positions = []
 		for term in terms:
-			index = wordsUnique.index(term)
-			if index not in positions: positions.append(index)
+			if term in wordsUnique:
+				index = wordsUnique.index(term)
+				if index not in positions: positions.append(index)
 
 		# Compute the final vector
 		# 1 if the word is present in the quote

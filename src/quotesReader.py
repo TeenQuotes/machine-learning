@@ -1,4 +1,7 @@
 from csv import DictReader
+from collections import Counter
+from numpy import linspace
+from math import floor
 from quote import *
 	
 class QuotesReader():
@@ -46,14 +49,15 @@ class QuotesReader():
 		"""Builds a list of whitespace delimited tokens from a list of strings."""			
 
 		words = ' '.join(self.quotesText)
-		wordsUnique = []
+		
+		# Create a dictionnary word: nbOccurences
+		freqs = Counter(words.split())
 
-		# Get non unique terms.
-		wordsNonUnique = words.split()
+		# Keep words that appears at least 5 times
+		freqs = {word: count for word, count in freqs.iteritems() if count >= 5}
 
-		# Build the list of unique terms
-		for term in wordsNonUnique:
-			if term not in wordsUnique: wordsUnique.append(term)
+		# Keep only the words
+		wordsUnique = freqs.keys()
 
 		self.wordsUnique = wordsUnique
 		self.saveWordsUnique()
@@ -62,12 +66,31 @@ class QuotesReader():
 		out = open('tmp/wordsUnique.txt', 'w')
 		out.write(' '.join(self.wordsUnique))
 
+	def constructListProgress(self):
+		"""Create a list containing the ID for each 10 % of the total number of quotes
+		For example if we have 10 quotes: [1 2 ... 9 10]"""
+
+		nbQuotes = len(self.quotes)
+		rangeProgress = linspace(0.1 * nbQuotes, nbQuotes, 10)
+		rangeProgress = map(floor, rangeProgress)
+		rangeProgress = map(int, rangeProgress)
+
+		return rangeProgress
+
 	def wordPosition(self):
 		"""Compute the vector of position of words for each quotes"""
 		
 		vectorPositions = []
+		i = 1
+		rangeProgress = self.constructListProgress()
+
 		for quote in self.quotes:
+			# Print the progress
+			if i in rangeProgress:
+				index = (rangeProgress.index(i) + 1) * 10
+				print "%i%% done" % index
 			vectorPositions.append(quote.process(self.wordsUnique))
+			i += 1
 
 		self.wordPosition = vectorPositions
 	
