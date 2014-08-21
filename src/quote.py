@@ -5,9 +5,10 @@ from re import sub
 
 class Quote(object):
 	"""docstring for Quote"""
-	def __init__(self, content):
+	def __init__(self, content, approve):
 		super(Quote, self).__init__()
 		self.content = content
+		self.approve = approve
 		self.wordsUnique = []
 
 		# Sanitize the content of a quote
@@ -32,6 +33,15 @@ class Quote(object):
 
 	def getContent(self):
 		return self.content
+
+	def getApprove(self):
+		return self.approve
+
+	def isApproved(self):
+		return self.getApprove() == 1
+
+	def isRefused(self):
+		return self.getApprove() == -1
 
 	def loadWordsUnique(self):
 		self.wordsUnique = open('tmp/wordsUnique.txt').read().split()

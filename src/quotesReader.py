@@ -19,8 +19,6 @@ class QuotesReader():
 		else: self.contentName = contentName
 
 		self.getTextAndApproved()
-		self.extractUniqueWords()
-		self.wordPosition()
 		
 	def getTextAndApproved(self):
 		"""Read a file and create a list of the content of quotes
@@ -33,24 +31,26 @@ class QuotesReader():
 		quotesApproved = []
 		
 		for row in rows:
-			approved = int(row[self.approvedName])
+			approve = int(row[self.approvedName])
+			q = Quote(row[self.contentName], approve)
 
 			# Keep only published or refused quotes
-			if approved in [-1, 1]:
-				q = Quote(row[self.contentName])
+			if q.isApproved() or q.isRefused():
 				quotes.append(q)
-				quotesText.append(q.getContent())
-				quotesApproved.append(approved)
 
+		for q in quotes:
+			if q.isApproved(): quotesApproved.append(1)
+			else: quotesApproved.append(0)
+		
 		self.quotesApproved = quotesApproved
-		self.quotesText     = quotesText
+		self.quotesText     = [q.getContent() for q in quotes]
 		self.quotes         = quotes
 
 		print "%i exploitable quotes found" % len(quotes)
 
 	def extractUniqueWords(self):
-		"""Builds a list of whitespace delimited tokens from a list of strings."""			
-
+		"""Builds a list of whitespace delimited tokens from a list of strings."""
+		
 		words = ' '.join(self.quotesText)
 		
 		# Create a dictionnary word: nbOccurences
@@ -102,4 +102,9 @@ class QuotesReader():
 		self.wordPosition = vectorPositions
 	
 	def getApprovedAndWordPosition(self):
+		self.extractUniqueWords()
+		self.wordPosition()
 		return self.quotesApproved, self.wordPosition
+
+	def getQuotesTextAndApprove(self):
+		return self.quotesText, self.quotesApproved
