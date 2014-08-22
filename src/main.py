@@ -14,7 +14,13 @@ print "Training the tf-idf vectorizer"
 x_train = vectorizer.fit_transform(x_train)
 x_test = vectorizer.transform(x_test)
 
-tunedParameters = [{'C': [1, 10, 20, 50], 'kernel': ['linear']}]
+C = []
+gamma = []
+for i in range(21): C.append(10.0**(i-5))
+for i in range(10): gamma.append(10**(i-5))
+
+tunedParameters = [{'C': C, 'kernel': ['linear']},
+				{'C': C, 'kernel': ['rbf'], 'gamma': gamma}]
 
 scores = ['recall', 'precision']
 
