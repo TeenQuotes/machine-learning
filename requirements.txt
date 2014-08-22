@@ -1,4 +1,4 @@
-numpy==1.8.*
-scikit-learn==0.15.*
-scipy==0.14.*
-stemming==1.0.*
+numpy==1.8.2
+scikit-learn==0.15.1
+scipy==0.14.0
+stemming==1.0.1
