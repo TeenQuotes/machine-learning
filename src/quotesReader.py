@@ -3,45 +3,49 @@ from collections import Counter
 from numpy import linspace
 from math import floor
 from quote import *
-	
+
 class QuotesReader():
-	"""docstring for QuotesReader"""
-	def __init__(self, filename, approvedName = None, contentName = None):
+	"""Read a bunch of quotes"""
+	def __init__(self, filename, keepTypes = ["approve", "refuse"], useStemming = True, approvedColumnName = None, contentColumnName = None):
 		self.filename = filename
+		self.keepTypes = keepTypes
+		self.useStemming = useStemming
 		self.rows = DictReader(open(filename))
 
 		# Set the default value for the approved column
-		if approvedName is None: self.approvedName = "approved"
-		else: self.approvedName = approvedName
+		if approvedColumnName is None: self.approvedName = "approved"
+		else: self.approvedName = approvedColumnName
 
 		# Set the default value for the content column
-		if contentName is None: self.contentName = "content"
-		else: self.contentName = contentName
+		if contentColumnName is None: self.contentName = "content"
+		else: self.contentName = contentColumnName
 
 		self.getTextAndApproved()
-		
+
 	def getTextAndApproved(self):
 		"""Read a file and create a list of the content of quotes
 		and a list with the associated moderation decision"""
-		
+
 		rows = self.rows
-		
+
 		quotes         = []
 		quotesText     = []
 		quotesApproved = []
-		
+
 		for row in rows:
 			approve = int(row[self.approvedName])
-			q = Quote(row[self.contentName], approve)
+			q = Quote(row[self.contentName], approve, self.useStemming)
 
 			# Keep only published or refused quotes
-			if q.isApproved() or q.isRefused():
+			if "approve" in self.keepTypes and q.isApproved():
+				quotes.append(q)
+			if "refuse" in self.keepTypes and q.isRefused():
 				quotes.append(q)
 
 		for q in quotes:
 			if q.isApproved(): quotesApproved.append(1)
 			else: quotesApproved.append(0)
-		
+
 		self.quotesApproved = quotesApproved
 		self.quotesText     = [q.getContent() for q in quotes]
 		self.quotes         = quotes
@@ -50,9 +54,9 @@ class QuotesReader():
 
 	def extractUniqueWords(self):
 		"""Builds a list of whitespace delimited tokens from a list of strings."""
-		
+
 		words = ' '.join(self.quotesText)
-		
+
 		# Create a dictionnary word: nbOccurences
 		freqs = Counter(words.split())
 
@@ -85,7 +89,7 @@ class QuotesReader():
 
 	def wordPosition(self):
 		"""Compute the vector of position of words for each quotes"""
-		
+
 		print "Computing the vector for each quote"
 		vectorPositions = []
 		idQuote = 1
@@ -100,7 +104,7 @@ class QuotesReader():
 			idQuote += 1
 
 		self.wordPosition = vectorPositions
-	
+
 	def getApprovedAndWordPosition(self):
 		self.extractUniqueWords()
 		self.wordPosition()

@@ -4,11 +4,12 @@ from stemming.porter2 import stem
 from re import sub
 
 class Quote(object):
-	"""docstring for Quote"""
-	def __init__(self, content, approve):
+	"""Create a quote"""
+	def __init__(self, content, approve, useStemming):
 		super(Quote, self).__init__()
 		self.content = content
 		self.approve = approve
+		self.useStemming = useStemming
 		self.wordsUnique = []
 
 		# Sanitize the content of a quote
@@ -26,8 +27,9 @@ class Quote(object):
 		self.content = sub(":\(|:-\(|:'\(|:/", "sadsmiley", self.content)
 
 		# Stem each word of the sentence
-		self.content = ' '.join([stem(word) for word in self.content.split()])
-		
+		if self.useStemming:
+			self.content = ' '.join([stem(word) for word in self.content.split()])
+
 		# Remove punctuation
 		self.content = "".join(l for l in self.content if l not in stringPunctuation)
 
@@ -48,9 +50,9 @@ class Quote(object):
 
 	def process(self, wordsUnique = None):
 		"""Compute the vector of position of words for a quote"""
-		
+
 		terms = self.getContent().split()
-		
+
 		# Load wordsUnique if it was not given
 		if wordsUnique is None:
 			# Check if wordsUnique was not loaded
@@ -68,7 +70,7 @@ class Quote(object):
 
 		# Compute the final vector
 		# 1 if the word is present in the quote
-		# 0 otherwise 
+		# 0 otherwise
 		vector = []
 		for i in range(len(wordsUnique)):
 			if i in positions:
