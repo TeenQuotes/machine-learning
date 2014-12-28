@@ -24,6 +24,7 @@ op.add_option("--no-idf", action="store_false", dest="use_idf", default=True, he
 op.add_option("--use-hashing", action="store_true", default=False, help="Use a hashing feature vectorizer")
 op.add_option("--n-features", type=int, default=10000, help="Maximum number of features (dimensions) to extract from text.")
 op.add_option("--nb-clusters", type=int, default=10, help="The number of categories we want to create")
+op.add_option("--use-stemming", action="store_true", dest="use_stemming", default=False, help="Do we perform a stemming operation for each quote.")
 op.add_option("--verbose", action="store_true", dest="verbose", default=False, help="Print progress reports inside k-means algorithm.")
 
 print(__doc__)
@@ -37,7 +38,7 @@ if len(args) > 0:
 ###############################################################################
 # Read quotes
 
-qr = QuotesReader('data/realQuotes.csv', ["approve"], False)
+qr = QuotesReader('data/realQuotes.csv', ["approve"], opts.use_stemming)
 dataset, approved = qr.getQuotesTextAndApprove()
 nbClusters = opts.nb_clusters
 print("%d documents" % len(dataset))
